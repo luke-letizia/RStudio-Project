@@ -1,0 +1,164 @@
+---
+title: "Midterm 1"
+author: "Luke Letizia"
+date: "February 22, 2018"
+output: html_document
+---
+
+###Question 1
+Prove the following:
+$r^2 = R^2$ where $R^2 = \frac{Regression SS}{Total SS}$
+
+$r = \frac{1}{(n-1)s_xs_y}\sum_{i=1}^n(x_i - \bar x)(y_i - \bar y)$
+
+$R^2 = \frac{\sum_{i=1}^n(\hat{y} - \bar y)^2}{\sum_{i=1}^n(y_i - \bar y)^2}$
+
+$\frac{1}{(n-1)s_xs_y}\sum_{i=1}^n(x_i - \bar x)(y_i - \bar y) = \frac{\sum_{i=1}^n(\hat{y} - \bar y)^2}{(n-1)s_y^2}$
+
+$\frac{(n-1)s_y^2}{(n-1)s_xs_y}\sum_{i=1}^n(x_i - \bar x)(y_i - \bar y) = \sum_{i=1}^n(\hat{y} - \bar y)^2$
+
+$\frac{s_y}{s_x}\sum_{i=1}^n(x_i - \bar x)(y_i - \bar y) = \sum_{i=1}^n(\hat{y} - \bar y)^2$
+
+
+###Question 2
+```{r, echo = FALSE, results = 'hide'}
+data.1 = read.csv("C:/Users/Luke\\Downloads/DataQuestion2.csv")
+n = 130
+```
+
+a.
+```{r, echo = FALSE, results = 'hide'}
+mean(data.1$V1)
+sd(data.1$V1)
+min(data.1)
+max(data.1)
+```
+Mean = 2145.251
+
+Standard Deviation = 2459.051
+
+Minimum = 176.0436
+
+Maximum = 25526.64
+
+b.
+```{r}
+y = (log(data.1$V1))
+```
+
+c.
+```{r, echo = FALSE, results = 'hide'}
+Hist = hist(y, 30, main = "Log Claim Sizes", col = "darkblue", border = "black")
+Delta=Hist$breaks[2] - Hist$breaks[1]
+femp=(Hist$counts/n)/Delta
+f = density(y)
+```
+
+I chose to set the grid size to 30. Because the sample size is n=130 I wanted to choose a number of breaks that was less than 130. I decided to pick 30 because it is conveyed very nicely on the graph, you can see where it begins to incline and it is easy to read and analyse.
+
+d.
+```{r, echo = FALSE, results = 'hide'}
+plot(Hist$mid, femp ,type='l', xlab = 'Log Claim Sizes', ylab='Density', main='Density', col = "black")
+par(new = t)
+lines(f, lwd = 2, xlab = "Sample n", ylab = "Density", main = "Density of Log Claim Sizes", col = "red")
+par(new = t)
+lines(f$x,dnorm(f$x,mean(y),sd(y)), type="l", col="blue",ylab='Density', xlab='Log Claim Sizes')
+legend("topright", c("Empirical Density","Density of Log Claim Sizes", "Normal"), lty=c(1,1,1), col=c("black", "red", "blue"))
+```
+
+As the graph suggests, the log of claims is at it's maximum density around 7.25. The empirical density and the density of the log claim sizes are nearly identical, besides the fact that the empirical function is much smoother. The normal curve is similar in shape but differs greatly from the maximum data points.
+
+e.
+```{r, echo = FALSE, results = 'hide'}
+qqnorm(y , main="Normal QQ plot")
+qqline(y, col = "red")
+shapiro.test(y)
+```
+
+The qqplot shows that the data doesn't follow normal distribution because several data points on the extremes of the graph deviate greatly from the best fit line.
+
+
+f.
+
+According to the qqplot, the values on the extremes of the plot are either far under or above the abline, meaning they deviate very far from the abline and would create scenarios where the insurance company would under-price significantly.
+
+
+###Question 3
+a.
+```{r, echo = FALSE, results = 'hide'}
+data.2 = read.csv("C:/Users/Luke\\Downloads/DataQuestion3.csv")
+sales = lm(V2 ~ V1, data = data.2)
+plot(V2 ~ V1, data = data.2, main = "Lottery Ticket Sales vs Town Population", xlab = "Population", ylab = "Sales")
+abline(sales, lwd = 2, col = "red")
+B0 = coef(sales)[1]
+B1 = coef(sales)[2]
+B1
+```
+
+$\beta_0$ = 653.3349
+
+$\beta_1$ = 0.6410505
+
+The model shows that the more the population increases, the more the sales also increase. This assumption is very reasonable and sensical.
+
+b.
+```{r, echo = FALSE, results = 'hide'}
+y.hat = predict(sales, data.frame(V1 = 10000))
+```
+
+
+$\hat{y}$ = 7063.839
+
+c.
+The random variable $\hat{Y}$ is an expected value of the linear regression model. Y differs from $\hat{Y}$ in that $\hat{Y}$ is an expected output value from plugging in a given x value.
+
+d.
+```{r, echo = FALSE, results = 'hide'}
+sigma = sd(data.2$V1)
+n = 100
+B0 = coef(sales)[1]
+B1 = coef(sales)[2]
+tb1 = c(data.2$V1, data.2$V2)
+x=runif(n,20,100)
+
+for(i in 1:100) {
+Y = B0 + B1 * data.2$V1 + rnorm(n,0,sigma)
+hat_beta1 = cor(data.2$V1, data.2$V2) * sd(data.2$V2)/sd(data.2$V1)
+hat_beta0 = mean(data.2$V2) - hat_beta1 * mean(data.2$V1)
+yhat = hat_beta0 + hat_beta1 * data.2$V1
+E = data.2$V2 - yhat
+s = sqrt(sum(E^2)/(n-2))
+sebeta1 = s/(sd(data.2$V1) * sqrt(n-1))
+tb1[i] = (hat_beta1 - B1)/sebeta1
+}
+
+mean(Y)
+hist(Y, 30, main = "Histogram of Simulation", col = "black", border = "white")
+hist(data.2$V2, 30, main = "Histogram of Data Set", xlab = "yi", col = "grey")
+```
+
+
+e.
+```{r, echo = FALSE, results = 'hide'}
+predict(sales, data.frame(V1 = 10000), interval = "confidence")
+```
+Confidence Bounds at 95%: 
+
+Lower:6456.396
+
+Upper:7671.583
+
+
+f.
+```{r, echo = FALSE, results = 'hide'}
+out = summary(sales)
+out$residuals[1:5]
+plot(out$residuals, xlab = "Population", ylab = "Residuals", main = "Residuals Effected by Popoulation")
+```
+
+Throughout the entirety of the plot, the residuals are scattered everywhere but tend to be more populated around the point where residuals equals 0. There doesn't seem to be much relationship or correlation between the population size and the outputted residuals.
+
+
+g.
+
+I think the regression model is a valid estimator for future sales because we are able to clearly read and analyze what the data is telling us and how we can expect it to act in the future. It would just depend on how precisely and consistently we can predict the future sales.
