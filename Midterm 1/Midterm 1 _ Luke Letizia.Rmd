@@ -54,7 +54,7 @@ femp=(Hist$counts/n)/Delta
 f = density(y)
 ```
 
-I chose to set the grid size to 30. Because the sample size is n=130 I wanted to choose a number of breaks that was less than 130. I decided to pick 30 because it is conveyed very nicely on the graph, you can see where it begins to incline and it is easy to read and analyse.
+I chose to set the grid size to 30. Because the sample size is n=130 I wanted to choose a number of breaks that was less than 130. I decided to pick 30 because it is conveyed very nicely on the graph, you can see where it begins to incline and it is easy to read and analyze.
 
 d.
 ```{r, echo = FALSE, results = 'hide'}
